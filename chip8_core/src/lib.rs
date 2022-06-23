@@ -55,7 +55,7 @@ impl Emu {
             stack: [0; STACK_SIZE],
             keys: [false; NUM_KEYS],
             dt: 0,
-            st: 0
+            st: 0,
         };
 
         new_emu.ram[..FONTSET_SIZE].copy_from_slice(&FONTSET);
@@ -75,7 +75,7 @@ impl Emu {
         self.st = 0;
         self.ram[..FONTSET_SIZE].copy_from_slice(&FONTSET);
     }
-        
+
 
     fn push(&mut self, val: u16) {
         self.stack[self.sp as usize] = val;
@@ -92,6 +92,7 @@ impl Emu {
         let op = self.fetch();
         // Decode & Execute
         self.execute(op);
+        self.tick_timers();
     }
 
     fn execute(&mut self, op: u16) {
@@ -99,7 +100,7 @@ impl Emu {
         let digit2 = (op & 0x0F00) >> 8;
         let digit3 = (op & 0x00F0) >> 4;
         let digit4 = op & 0x000F;
-        
+
         println!("0x{:04X}", &op);
 
         match (digit1, digit2, digit3, digit4) {
@@ -176,7 +177,7 @@ impl Emu {
                 let vy_addr = digit3 as usize;
                 let (new_vx, carry) = self.v_regs[vx_addr]
                     .overflowing_add(self.v_regs[vy_addr]);
-                
+
                 let new_vf = if carry { 1 } else { 0 };
                 self.v_regs[vx_addr] = new_vx;
                 self.v_regs[0xF] = new_vf; // Setting VF
@@ -188,7 +189,7 @@ impl Emu {
                 let (new_vx, borrow) = self.v_regs[vx_addr]
                     .overflowing_sub(self.v_regs[vy_addr]);
                 let new_vf = if borrow { 0 } else { 1 };
-                
+
                 self.v_regs[vx_addr] = new_vx;
                 self.v_regs[0xF] = new_vf; // Setting VF
             },
@@ -205,7 +206,7 @@ impl Emu {
                 let (new_vx, borrow) = self.v_regs[vy_addr]
                     .overflowing_sub(self.v_regs[vx_addr]);
                 let new_vf = if borrow { 0 } else { 1 };
-                
+
                 self.v_regs[vx_addr] = new_vx;
                 self.v_regs[0xF] = new_vf;
             },
@@ -241,7 +242,7 @@ impl Emu {
                 let x_cord = self.v_regs[digit2 as usize] as u16;
                 let y_cord = self.v_regs[digit3 as usize] as u16;
                 let num_rows = digit4; // How many rows high our sprite is
-                
+
                 let mut flipped = false;
                 for y_line in 0..num_rows { // Iterate each line of the sprite
                     let addr = (self.i_reg + y_line) as u16;
@@ -298,7 +299,7 @@ impl Emu {
                         break;
                     }
                 }
-                
+
                 // Redo opcode
                 if !pressed {
                     self.pc -= 2;
@@ -387,13 +388,7 @@ impl Emu {
     pub fn load(&mut self, program: &[u8]) {
         let start = START_ADDR as usize;
         let end = (START_ADDR as usize) + program.len();
-        
+
         self.ram[start..end].copy_from_slice(program);
-        /*
-        let end = (program.len() - start) as usize;
-        for i in 0..end {
-            self.ram[start + i] = program[i];
-        }
-        */
     }
 }

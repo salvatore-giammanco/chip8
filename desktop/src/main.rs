@@ -16,7 +16,7 @@ const TICKS_PER_FRAME: usize = 10;
 
 
 fn main() {
-    let args: Vec<_> = env::args().collect();
+    let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
         println!("Usage: cargo run path/to/the/game");
         return;
@@ -41,13 +41,13 @@ fn main() {
         .opengl()
         .build()
         .unwrap();
-    
+
     let mut canvas = window
         .into_canvas()
         .present_vsync()
         .build()
         .unwrap();
-    
+
     canvas.clear();
     canvas.present();
 
@@ -56,23 +56,23 @@ fn main() {
     'gameloop: loop {
         for evt in event_pump.poll_iter() {
             match evt {
-                Event::Quit{..} | Event::KeyDown{keycode: Some(Keycode::Escape), ..} => {
+                Event::Quit { .. } | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                     break 'gameloop;
-                },
-                Event::KeyDown{keycode: Some(key), ..} => {
+                }
+                Event::KeyDown { keycode: Some(key), .. } => {
                     if let Some(k) = key2btn(key) {
                         chip8.keypress(k, true);
                     }
-                },
-                Event::KeyUp{keycode: Some(key), ..} => {
+                }
+                Event::KeyUp { keycode: Some(key), .. } => {
                     if let Some(k) = key2btn(key) {
                         chip8.keypress(k, false);
                     }
-                },
+                }
                 _ => ()
             }
         }
-        for _ in 0..TICKS_PER_FRAME{
+        for _ in 0..TICKS_PER_FRAME {
             chip8.tick();
         }
         draw_screen(&chip8, &mut canvas);
@@ -89,7 +89,6 @@ fn draw_screen(emu: &Emu, canvas: &mut Canvas<Window>) {
 
     canvas.set_draw_color(Color::RGB(255, 255, 255));
     for (i, pixel) in screen_buf.iter().enumerate() {
-
         if *pixel {
             let x = (i % SCREEN_WIDTH) as u32;
             let y = (i / SCREEN_WIDTH) as u32;
