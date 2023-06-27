@@ -1,10 +1,10 @@
 use chip8_core::*;
 use sdl2::event::Event;
+use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
-use sdl2::keyboard::Keycode;
 use std::env;
 use std::fs::File;
 use std::io::Read;
@@ -14,14 +14,13 @@ const WINDOW_WIDTH: u32 = (SCREEN_WIDTH as u32) * SCALE;
 const WINDOW_HEIGHT: u32 = (SCREEN_HEIGHT as u32) * SCALE;
 const TICKS_PER_FRAME: usize = 12;
 
-
-fn main(){
+fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
         println!("Usage: cargo run path/to/the/game");
         return;
     }
-    
+
     // Read file
     let mut chip8 = Emu::new();
     println!("Requested game path: {}", &args[1]);
@@ -41,11 +40,7 @@ fn main(){
         .build()
         .unwrap();
 
-    let mut canvas = window
-        .into_canvas()
-        .present_vsync()
-        .build()
-        .unwrap();
+    let mut canvas = window.into_canvas().present_vsync().build().unwrap();
 
     canvas.clear();
     canvas.present();
@@ -55,20 +50,28 @@ fn main(){
     'gameloop: loop {
         for evt in event_pump.poll_iter() {
             match evt {
-                Event::Quit { .. } | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
+                Event::Quit { .. }
+                | Event::KeyDown {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => {
                     break 'gameloop;
                 }
-                Event::KeyDown { keycode: Some(key), .. } => {
+                Event::KeyDown {
+                    keycode: Some(key), ..
+                } => {
                     if let Some(k) = key2btn(key) {
                         chip8.keypress(k, true);
                     }
                 }
-                Event::KeyUp { keycode: Some(key), .. } => {
+                Event::KeyUp {
+                    keycode: Some(key), ..
+                } => {
                     if let Some(k) = key2btn(key) {
                         chip8.keypress(k, false);
                     }
                 }
-                _ => ()
+                _ => (),
             }
         }
         for _ in 0..TICKS_PER_FRAME {
@@ -81,7 +84,6 @@ fn main(){
         draw_screen(&chip8, &mut canvas);
     }
 }
-
 
 fn draw_screen(emu: &Emu, canvas: &mut Canvas<Window>) {
     // Clear canvas
