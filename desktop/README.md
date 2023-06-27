@@ -10,3 +10,7 @@ Add this to bash profile:
 ```
 export LIBRARY_PATH="$LIBRARY_PATH:/usr/local/lib"
 ```
+
+## To do
+- [] Add sound (desktop and WASM compatible)
+- [] Remove video flickering

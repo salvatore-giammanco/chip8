@@ -41,6 +41,7 @@ pub struct Emu {
     keys: [bool; NUM_KEYS],
     dt: u8, // Delay Timer (DT)
     st: u8, // Sound Timer (ST)
+    pub play_beep: bool, // Play beep sound
 }
 
 impl Emu {
@@ -56,6 +57,7 @@ impl Emu {
             keys: [false; NUM_KEYS],
             dt: 0,
             st: 0,
+            play_beep: false,
         };
 
         new_emu.ram[..FONTSET_SIZE].copy_from_slice(&FONTSET);
@@ -74,6 +76,7 @@ impl Emu {
         self.dt = 0;
         self.st = 0;
         self.ram[..FONTSET_SIZE].copy_from_slice(&FONTSET);
+        self.play_beep = false;
     }
 
 
@@ -101,8 +104,6 @@ impl Emu {
         let digit3 = (op & 0x00F0) >> 4;
         let digit4 = op & 0x000F;
 
-        println!("0x{:04X}", &op);
-
         match (digit1, digit2, digit3, digit4) {
             (0, 0, 0, 0) => return, // NOP - No operation
             (0, 0, 0xE, 0) => {     // CLS - Clear screen
@@ -116,7 +117,6 @@ impl Emu {
             },
             (2, _, _, _) => {       // CALL NNN - Enter subroutine at 0xNNN
                 self.push(self.pc);
-                println!("CALL NNN: 0x{:03X}", op & 0xFFF);
                 dbg!(self.pc);
                 self.pc = op & 0xFFF;
                 dbg!(self.pc);
@@ -370,8 +370,7 @@ impl Emu {
 
         if self.st > 0 {
             if self.st == 1 {
-                // Beep
-                // TODO: Implement (make sure to make it work both for desktop and WebAssembly)
+                self.play_beep = true;
             }
             self.st -= 1;
         }

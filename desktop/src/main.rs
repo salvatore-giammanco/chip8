@@ -12,18 +12,17 @@ use std::io::Read;
 const SCALE: u32 = 20;
 const WINDOW_WIDTH: u32 = (SCREEN_WIDTH as u32) * SCALE;
 const WINDOW_HEIGHT: u32 = (SCREEN_HEIGHT as u32) * SCALE;
-const TICKS_PER_FRAME: usize = 10;
+const TICKS_PER_FRAME: usize = 12;
 
 
-fn main() {
+fn main(){
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
         println!("Usage: cargo run path/to/the/game");
         return;
     }
-
+    
     // Read file
-
     let mut chip8 = Emu::new();
     println!("Requested game path: {}", &args[1]);
     let mut rom = File::open(&args[1]).expect("Unable to open file");
@@ -74,6 +73,10 @@ fn main() {
         }
         for _ in 0..TICKS_PER_FRAME {
             chip8.tick();
+            if chip8.play_beep {
+                // TODO: Play beep
+                chip8.play_beep = false;
+            }
         }
         draw_screen(&chip8, &mut canvas);
     }
@@ -101,7 +104,6 @@ fn draw_screen(emu: &Emu, canvas: &mut Canvas<Window>) {
 }
 
 fn key2btn(key: Keycode) -> Option<usize> {
-    println!("Key pressed: {:?}", &key);
     match key {
         Keycode::Num1 => Some(0x1),
         Keycode::Num2 => Some(0x2),
