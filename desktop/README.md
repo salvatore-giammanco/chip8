@@ -12,5 +12,5 @@ export LIBRARY_PATH="$LIBRARY_PATH:/usr/local/lib"
 ```
 
 ## To do
-- [] Add sound (desktop and WASM compatible)
-- [] Remove video flickering
+- Add sound (desktop and WASM compatible)
+- Remove video flickering
