@@ -5,7 +5,7 @@
 
 My version of the famous chip8 emulator written in Rust.
 
-## Next features
+## Next features
 - WASM Support
 - Sound
 
