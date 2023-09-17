@@ -1,0 +1,14 @@
+<html>
+    <head>
+        <script type="module">
+            import * as wasm from "../pkg/wasm_interface_bg.wasm";
+            import { __wbg_set_wasm } from "../pkg/wasm_interface_bg.js";
+            __wbg_set_wasm(wasm);
+            export * from "../pkg/wasm_interface_bg.js";
+
+        </script>
+    </head>
+    <body>
+
+    </body>
+</html>
